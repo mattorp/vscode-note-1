@@ -1,10 +1,10 @@
-import { faPen } from '@fortawesome/free-solid-svg-icons/faPen';
-import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
-import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faPen} from '@fortawesome/free-solid-svg-icons/faPen';
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
+import {faSearch} from '@fortawesome/free-solid-svg-icons/faSearch';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ToWebView as twv } from '../panel/notesMessage';
+import {ToWebView as twv} from '../panel/notesMessage';
 
 import './index.scss';
 
@@ -14,16 +14,16 @@ interface vscode {
 // declare function acquireVsCodeApi(): vscode;
 declare const vscode: vscode;
 
-const addCategory = () => () => vscode.postMessage({ command: 'add-category' });
-const editCategory = (category: string) => () => vscode.postMessage({ command: 'edit-category', data: { category } });
-const addNote = (category: string) => () => vscode.postMessage({ command: 'add', data: category });
-const editNote = (id: string, category: string) => () => vscode.postMessage({ command: 'edit', data: { id, category } });
-const editContentFile = (id: string, n: string) => () => vscode.postMessage({ command: 'edit-contentFile', data: { id, n } });
-const editCol = (id: string, cn: string) => () => vscode.postMessage({ command: 'edit-col', data: { id, cn } });
-const viewDoc = (id: string) => () => vscode.postMessage({ command: 'doc', data: id });
-const viewFiles = (id: string) => () => vscode.postMessage({ command: 'files', data: id });
+const addCategory = () => () => vscode.postMessage({command: 'add-category'});
+const editCategory = (category: string) => () => vscode.postMessage({command: 'edit-category', data: {category}});
+const addNote = (category: string) => () => vscode.postMessage({command: 'add', data: category});
+const editNote = (id: string, category: string) => () => vscode.postMessage({command: 'edit', data: {id, category}});
+const editContentFile = (id: string, n: string) => () => vscode.postMessage({command: 'edit-contentFile', data: {id, n}});
+const editCol = (id: string, cn: string) => () => vscode.postMessage({command: 'edit-col', data: {id, cn}});
+const viewDoc = (id: string) => () => vscode.postMessage({command: 'doc', data: id});
+const viewFiles = (id: string) => () => vscode.postMessage({command: 'files', data: id});
 
-function renderNoteDoc(props: { id: string }) {
+function renderNoteDoc(props: {id: string}) {
     return (
         <a onClick={viewDoc(props.id)}>
             <span>{props.id.substr(0, 3)}</span>
@@ -31,7 +31,7 @@ function renderNoteDoc(props: { id: string }) {
     );
 }
 
-function renderNoteFiles(props: { id: string }) {
+function renderNoteFiles(props: {id: string}) {
     return (
         <a onClick={viewFiles(props.id)}>
             <span>{props.id.substr(3, 3)}</span>
@@ -49,9 +49,9 @@ function VSNNotes(props: WVNote) {
         </div>
     ));
 
-    const isDoc = props.doc ? renderNoteDoc({ id: props.nId }) : <span>{props.nId.substr(0, 3)}</span>;
-    const isFiles = props.files ? renderNoteFiles({ id: props.nId }) : <span>{props.nId.substr(3, 3)}</span>;
-    const gridNoteContentStyle: React.CSSProperties = { gridTemplateColumns: `repeat(${contents.length}, 1fr)` };
+    const isDoc = props.doc ? renderNoteDoc({id: props.nId}) : <span>{props.nId.substr(0, 3)}</span>;
+    const isFiles = props.files ? renderNoteFiles({id: props.nId}) : <span>{props.nId.substr(3, 3)}</span>;
+    const gridNoteContentStyle: React.CSSProperties = {gridTemplateColumns: `repeat(${contents.length}, 1fr)`};
 
     return (
         <div className="grid-note">
@@ -116,18 +116,18 @@ function filterNotes(categories: twv.WVCategory[], key: string) {
             }
         }
         if (newNotes.length >= 1) {
-            newCategory.push({ name: category.name, notes: newNotes });
+            newCategory.push({name: category.name, notes: newNotes});
         }
     }
     return newCategory;
 }
 
 function VNSDomain(props: WVDomain) {
-    const [state, setState] = React.useState({ switch: false, key: '' });
+    const [state, setState] = React.useState({switch: false, key: ''});
 
     const categories = () => {
         if (newDomain) {
-            setState({ switch: false, key: '' });
+            setState({switch: false, key: ''});
             newDomain = false;
         }
         return (state.switch && state.key.length >= 1 && !newDomain
@@ -142,11 +142,11 @@ function VNSDomain(props: WVDomain) {
     };
 
     const handleLogoutClick = () => {
-        setState({ switch: !state.switch, key: '' });
+        setState({switch: !state.switch, key: ''});
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState({ switch: true, key: event.target.value });
+        setState({switch: true, key: event.target.value});
     };
 
     const search = () => {
@@ -177,19 +177,12 @@ function VNSDomain(props: WVDomain) {
         </div>
     );
 }
-window.addEventListener('message', event => {
-    const message: twv.DomainData = event.data;
 
-    switch (message.command) {
-        case 'data':
-            const dpath = message.data.dpath;
-            const categories = message.data.categories;
-            newDomain = true;
-            ReactDOM.render(<VNSDomain dpath={dpath} categories={categories} />, document.getElementById('root'));
-            break;
-        default:
-            ReactDOM.render(<h1>loading...{message}</h1>, document.getElementById('root'));
-    }
+window.addEventListener('message', _event => {
+    const sayHello = (): void => vscode.postMessage({command: 'say-hello'})
+    const handleClick: React.MouseEventHandler = () => sayHello()
+    sayHello()
+    ReactDOM.render(<button onClick={handleClick}>Say hello</button>, document.getElementById('root'));
 });
 
 let newDomain = true;

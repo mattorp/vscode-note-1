@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ext } from '../extensionVariables';
-import { ToWebView as twv } from './notesMessage';
-import { tools } from '../helper';
+import {ext} from '../extensionVariables';
+import {ToWebView as twv} from './notesMessage';
+import {tools} from '../helper';
 
 export class NotesPanelView {
     private panel: vscode.WebviewPanel | undefined = undefined;
@@ -12,7 +12,7 @@ export class NotesPanelView {
     private assetsFile = (name: string) => {
         const file = path.join(ext.context.extensionPath, 'out', name);
         return vscode.Uri.file(file)
-            .with({ scheme: 'vscode-resource' })
+            .with({scheme: 'vscode-resource'})
             .toString();
     };
 
@@ -31,7 +31,7 @@ export class NotesPanelView {
                     <script>
                         const vscode = acquireVsCodeApi();
                         window.onload = function() {
-                            vscode.postMessage({ command: 'get-data' });
+                            
                             console.log('Ready to accept data.');
                         };
                     </script>
@@ -45,7 +45,7 @@ export class NotesPanelView {
             this.initPanel();
         }
 
-        this.panel!.webview.postMessage({ command: 'data', data: this.viewData });
+        this.panel!.webview.postMessage({command: 'data', data: this.viewData});
         if (!this.panel!.visible) {
             this.panel!.reveal(vscode.ViewColumn.One);
         }
@@ -79,6 +79,9 @@ export class NotesPanelView {
         this.panel.webview.onDidReceiveMessage(
             msg => {
                 switch (msg.command) {
+                    case 'say-hello':
+                        vscode.window.showInformationMessage('hello from react')
+                        break;
                     case 'get-data':
                         this.showNotesPlanView();
                         break;
@@ -121,7 +124,7 @@ export class NotesPanelView {
     }
 
     public addCategory(name: string) {
-        this.viewData!.categories.unshift({ name: name, notes: [] });
+        this.viewData!.categories.unshift({name: name, notes: []});
         return this;
     }
 
@@ -137,11 +140,11 @@ export class NotesPanelView {
             const isFiles = ext.dbFS.selectFilesExist(nId);
 
             if (categories.filter(c => c.name === cname).length >= 1) {
-                categories.filter(c => c.name === cname)[0].notes.push({ nId, contents, doc: isDoc, files: isFiles });
+                categories.filter(c => c.name === cname)[0].notes.push({nId, contents, doc: isDoc, files: isFiles});
             } else {
-                categories.push({ name: cname, notes: [{ nId, contents, doc: isDoc, files: isFiles }] });
+                categories.push({name: cname, notes: [{nId, contents, doc: isDoc, files: isFiles}]});
             }
         }
-        return { dpath: this.dpathCache, categories: categories };
+        return {dpath: this.dpathCache, categories: categories};
     }
 }

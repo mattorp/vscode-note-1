@@ -131,6 +131,11 @@
         ],
         "commands": [
             {
+                "command": "sciple.sciple",
+                "title": "Sciple",
+                "category": "Science"
+            },
+            {
                 "command": "vscode-note.domain.create",
                 "title": "New Domain",
                 "icon": {

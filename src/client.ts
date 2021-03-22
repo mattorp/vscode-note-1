@@ -1,26 +1,27 @@
 import * as https from 'https';
-import { tools } from './helper';
-import { homedir, platform, release, type, hostname, arch } from 'os';
-import { join } from 'path';
-import { vfs } from './helper';
-import { existsSync, readdirSync, removeSync, mkdirpSync } from 'fs-extra';
-import { version as lastVersion } from '../package.json';
+import {tools} from './helper';
+import {homedir, platform, release, type, hostname, arch} from 'os';
+import {join} from 'path';
+import {vfs} from './helper';
+import {existsSync, readdirSync, removeSync, mkdirpSync} from 'fs-extra';
+import {version as lastVersion} from '../package.json';
 import compareVersions from 'compare-versions';
-import { identifier } from './constants';
-import { addHours, isPast } from 'date-fns';
+import {identifier} from './constants';
+import {addHours, isPast} from 'date-fns';
 import * as querystring from 'querystring';
+import vscode from 'vscode';
 
 type ActionTimestamp = number;
-type OSInfo = { [attr: string]: string };
-type Actions = { [action: string]: ActionTimestamp[] };
+type OSInfo = {[attr: string]: string};
+type Actions = {[action: string]: ActionTimestamp[]};
 
 function currentTime() {
     return new Date().getTime();
 }
 
-type ActionsBody = { cid: string; action: string; timestamp: number; version: string };
+type ActionsBody = {cid: string; action: string; timestamp: number; version: string};
 
-type ClientInfoBody = { cid: string; info: OSInfo; timestamp: number; version: string };
+type ClientInfoBody = {cid: string; info: OSInfo; timestamp: number; version: string};
 
 function genClientId() {
     vfs.writeFileSync(ClientFiles.id, tools.hexRandom(10));
@@ -61,7 +62,7 @@ const getPreviousVersion = (extonionsPath: string) => {
 const stageActions = (actions: Actions) => vfs.writeJsonSync(ClientFiles.actions, actions);
 
 function getOSInfo() {
-    return { type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch() };
+    return {type: type(), platform: platform(), release: release(), hostname: hostname(), arch: arch()};
 }
 
 function versionUpgrade(extonionPath: string) {
@@ -84,13 +85,13 @@ function versionUpgrade(extonionPath: string) {
 }
 
 const postSlack = (body: ClientInfoBody | ActionsBody) => {
-    const b: string = JSON.stringify({ text: JSON.stringify(body) });
+    const b: string = JSON.stringify({text: JSON.stringify(body)});
     return new Promise<string>((resolve, reject) => {
         const options: https.RequestOptions = {
             host: 'hooks.slack.com',
             path: '/services/THAUWRE2W/BJACQ46CX/vmUGK9qnTQDRNtxETMwavscn',
             method: 'POST',
-            headers: { 'Content-type': 'application/json; charset=UTF-8' }
+            headers: {'Content-type': 'application/json; charset=UTF-8'}
         };
 
         const req = https.request(options, res => {
@@ -108,11 +109,11 @@ const postSlack = (body: ClientInfoBody | ActionsBody) => {
 };
 
 function makePostActionsBody(action: string, timestamp: number): ActionsBody {
-    return { action, timestamp, cid: getClientId(), version: lastVersion };
+    return {action, timestamp, cid: getClientId(), version: lastVersion};
 }
 
 function makePostClientInfoBody(timestamp: number): ClientInfoBody {
-    return { cid: getClientId(), info: getOSInfo(), timestamp, version: lastVersion };
+    return {cid: getClientId(), info: getOSInfo(), timestamp, version: lastVersion};
 }
 
 async function sendClientActions(action: string) {
@@ -150,7 +151,7 @@ export function initClient(extonionPath: string) {
     if (!existsSync(ClientFiles.home)) {
         mkdirpSync(ClientFiles.home);
         genClientId();
-        stageActions({ installed: [currentTime()] });
+        stageActions({installed: [currentTime()]});
     }
     versionUpgrade(extonionPath);
     doActive();
@@ -162,9 +163,12 @@ export function sendGA() {
     const t = 'event';
     const v = 1;
     const uid = getClientId();
+    vscode.window.showInformationMessage('Hello from Load')
+
+
 
     return (ec: string, ea: string) => {
-        const body = { v, tid, uid, t, ec, ea };
+        const body = {v, tid, uid, t, ec, ea};
         const data = querystring.stringify(body);
 
         return new Promise<void>((resolve, reject) => {
